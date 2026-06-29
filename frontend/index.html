@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CivicGuardian AI - Government Benefits Navigator</title>
+<style>
+  :root {
+    --primary: #0B3D91;
+    --primary-light: #1565C0;
+    --accent: #138808;
+    --accent-light: #43A047;
+    --danger: #C62828;
+    --warning: #EF6C00;
+    --bg: #F5F7FB;
+    --card: #FFFFFF;
+    --text: #1A1A1A;
+    --muted: #6B7280;
+    --border: #E5E9F0;
+    --shadow: 0 4px 20px rgba(11,61,145,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body{
+    font-family:'Inter','Segoe UI',system-ui,sans-serif;
+    background:
+        radial-gradient(circle at top left,#F7FBFF 0%,#EEF5FF 40%,#F5F7FB 100%);
+    color:var(--text);
+}
+
+  /* Layout */
+  .app { display: flex; min-height: 100vh; }
+  .sidebar{
+
+background:
+linear-gradient(180deg,
+#092A5A,
+#0B3D91);
+
+}
+  .main{
+    flex:1;
+    padding:32px 40px;
+    overflow-y:auto;
+    width:100%;
+    max-width:1400px;
+    margin:auto;
+}
+
+  /* Sidebar */
+  .sidebar h2{
+
+font-size:30px;
+
+font-weight:800;
+
+letter-spacing:-1px;
+
+margin-bottom:8px;
+
+}
+  .sidebar .tagline { font-size: 0.75rem; opacity: 0.7; margin-bottom: 20px; }
+  .sidebar label { display: block; font-size: 0.78rem; color: #B0C4DE; margin-bottom: 4px; margin-top: 14px; font-weight: 600; letter-spacing: 0.3px; }
+  .sidebar select,
+.sidebar input{
+
+background:rgba(255,255,255,.12);
+
+border:1px solid rgba(255,255,255,.18);
+
+border-radius:12px;
+
+padding:12px;
+
+font-size:15px;
+
+transition:.25s;
+
+}
+  .sidebar input:focus,
+  .sidebar select:focus{
+
+border-color:#43A047;
+
+box-shadow:
+0 0 0 3px rgba(67,160,71,.25);
+
+}
+  .sidebar select option { background: #0B2A5B; }
+  .sidebar input[type=checkbox] { margin-right: 8px; }
+  .sidebar .check-label { font-size: 0.85rem; color: #E8EEF8; display: flex; align-items: center; margin-top: 14px; }
+  .sidebar hr { border: none; border-top: 1px solid rgba(255,255,255,0.15); margin: 18px 0; }
+  .analyze-btn{
+
+padding:16px;
+
+font-size:17px;
+
+font-weight:700;
+
+border-radius:14px;
+
+background:linear-gradient(
+135deg,
+#16A34A,
+#138808);
+
+box-shadow:
+0 12px 30px rgba(19,136,8,.35);
+
+}
+  .analyze-btn:hover{
+
+transform:translateY(-3px);
+
+box-shadow:
+0 18px 35px rgba(19,136,8,.45);
+
+}
+  .analyze-btn:active { transform: translateY(0); }
+  .ai-status { font-size: 0.72rem; color: #B0C4DE; margin-top: 10px; text-align: center; }
+
+  /* Hero */
+  .hero{
+    position:relative;
+    overflow:hidden;
+    background:linear-gradient(
+        135deg,
+        #0B3D91 0%,
+        #1565C0 45%,
+        #1976D2 75%,
+        #138808 100%
+    );
+
+    border-radius:22px;
+    padding:40px;
+    color:white;
+
+    box-shadow:
+        0 18px 40px rgba(11,61,145,.25);
+
+    margin-bottom:28px;
+}
+  .hero::before{
+
+  content:"";
+
+  position:absolute;
+
+  top:-120px;
+
+  right:-70px;
+
+  width:280px;
+
+  height:280px;
+
+  background:rgba(255,255,255,.12);
+
+  border-radius:50%;
+
+  }
+
+  .hero::after{
+
+  content:"";
+
+  position:absolute;
+
+  bottom:-130px;
+
+  left:-60px;
+
+  width:220px;
+
+  height:220px;
+
+  background:rgba(255,255,255,.08);
+
+  border-radius:50%;
+
+  }
+  .hero h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; }
+  .hero p { opacity: 0.92; margin-top: 6px; font-size: 0.98rem; }
+  .hero .version { font-size: 0.72rem; opacity: 0.65; margin-top: 8px; }
+
+  /* Cards */
+  .card{
+
+background:white;
+
+border-radius:18px;
+
+padding:24px;
+
+margin-bottom:20px;
+
+border:1px solid #E8EDF5;
+
+box-shadow:
+0 6px 22px rgba(0,0,0,.05);
+
+transition:.25s;
+
+}
+  .card:hover{
+
+transform:translateY(-4px);
+
+box-shadow:
+0 15px 35px rgba(21,101,192,.12);
+
+}
+  .card h3 { color: var(--primary); font-size: 1.1rem; margin-bottom: 8px; }
+
+  /* Metrics */
+  .metrics { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; margin-bottom: 20px; }
+  .metric{
+
+background:white;
+
+padding:22px;
+
+border-radius:16px;
+
+border:1px solid #E7EDF7;
+
+box-shadow:
+0 5px 20px rgba(0,0,0,.05);
+
+transition:.2s;
+
+}
+  .metric:hover{
+
+transform:translateY(-3px);
+
+}
+  .metric .label { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+  .metric .value{
+
+font-size:2rem;
+
+font-weight:800;
+
+color:#0B3D91;
+
+}
+
+  /* Badges */
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 0.7rem; font-weight: 700; color: #fff; margin-right: 5px; }
+  .badge-high { background: #C62828; }
+  .badge-medium { background: #EF6C00; }
+  .badge-low { background: #2E7D32; }
+  .badge-cat { background: var(--primary); }
+
+  /* Progress bar */
+  .progress-track { width: 100%; height: 22px; border-radius: 999px; background: #E5E9F2; overflow: hidden; margin: 8px 0; }
+  .progress-fill{
+
+height:100%;
+
+border-radius:999px;
+
+background:
+linear-gradient(90deg,
+#16A34A,
+#22C55E);
+
+transition:width .6s ease;
+  }
+  /* Scheme cards */
+  .scheme-card{
+
+background:white;
+
+border-radius:18px;
+
+padding:24px;
+
+margin-bottom:22px;
+
+border:1px solid #E8EDF5;
+
+box-shadow:
+0 6px 24px rgba(0,0,0,.05);
+
+transition:.25s;
+
+}
+  .scheme-card:hover{
+
+transform:translateY(-4px);
+
+box-shadow:
+0 18px 35px rgba(11,61,145,.12);
+
+}
+  .scheme-card h4 { color: var(--primary); font-size: 1.05rem; margin-bottom: 8px; }
+  .scheme-card .desc { color: #374151; font-size: 0.88rem; line-height: 1.5; margin: 6px 0; }
+  .scheme-card .meta { font-size: 0.82rem; color: var(--muted); margin-top: 6px; }
+  .scheme-card .meta strong { color: var(--text); }
+  .match-score { display: inline-block; padding: 2px 10px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; }
+  .link-btn{
+
+display:inline-flex;
+
+align-items:center;
+
+gap:8px;
+
+padding:10px 18px;
+
+border-radius:12px;
+
+background:linear-gradient(
+135deg,
+#0B3D91,
+#1565C0);
+
+font-weight:700;
+
+font-size:14px;
+
+color:rgb(8, 0, 0);
+
+text-decoration:none;
+
+transition:.25s;
+
+}
+  .link-btn:hover{
+
+transform:translateY(-2px);
+
+box-shadow:
+0 10px 20px rgba(102, 149, 203, 0.25);
+
+}
+  .explain-toggle { background: none; border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; font-size: 0.78rem; cursor: pointer; color: var(--primary); margin-left: 8px; transition: background 0.2s; }
+  .explain-toggle:hover { background: #EEF2FF; }
+  .explanation-box{
+
+background:#F7FAFF;
+
+border-left:5px solid #1565C0;
+
+border-radius:12px;
+
+padding:18px;
+
+margin-top:18px;
+
+line-height:1.7;
+
+font-size:15px;
+
+box-shadow:
+0 5px 18px rgba(0,0,0,.04);
+
+}
+  .explanation-box.visible { display: block; }
+
+  /* Doc pills */
+  .doc-have{
+
+background:#E8F8ED;
+
+color:#138808;
+
+padding:8px 14px;
+
+border-radius:30px;
+
+font-weight:700;
+
+margin:6px;
+
+display:inline-block;
+
+}
+  .doc-miss{
+
+background:#FDECEC;
+
+color:#C62828;
+
+padding:8px 14px;
+
+border-radius:30px;
+
+font-weight:700;
+
+margin:6px;
+
+display:inline-block;
+
+}
+  /* Table */
+  .action-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  .action-table th { background: var(--accent); color: #fff; padding: 8px 12px; text-align: left; font-weight: 600; }
+  .action-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  .action-table tr:nth-child(even) { background: #F1F8E9; }
+
+  /* Alerts */
+  .alert { padding: 12px 16px; border-radius: 10px; margin: 10px 0; font-size: 0.88rem; }
+  .alert-success { background: #E6F4EA; color: #1B5E20; border-left: 4px solid #138808; }
+  .alert-info { background: #E3F2FD; color: #0D47A1; border-left: 4px solid #1565C0; }
+  .alert-warn { background: #FFF3E0; color: #BF360C; border-left: 4px solid #EF6C00; }
+  .tip { background: #E8F5E9; border-left: 4px solid var(--accent); padding: 10px 14px; border-radius: 6px; margin: 8px 0; font-size: 0.85rem; }
+
+  /* Loading */
+  .loading { text-align: center; padding: 40px; }
+  .spinner{
+
+width:60px;
+
+height:60px;
+
+border:6px solid #E9EEF7;
+
+border-top:6px solid #1565C0;
+
+border-radius:50%;
+
+animation:spin .8s linear infinite;
+
+}
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Welcome */
+  .welcome-grid{
+
+display:grid;
+
+grid-template-columns:2fr 1fr;
+
+gap:22px;
+
+margin-top:18px;
+
+}
+  .feature-list { list-style: none; padding: 0; }
+  .feature-list li { padding: 5px 0; font-size: 0.92rem; }
+  .feature-list li::before { content: "✅ "; }
+
+  /* Section headings */
+  .section-title{
+
+font-size:24px;
+
+font-weight:800;
+
+margin:32px 0 20px;
+
+color:#0B3D91;
+
+border-bottom:3px solid #E9EEF7;
+
+padding-bottom:10px;
+
+}
+  /* Footer */
+  .footer{
+
+margin-top:60px;
+
+padding:30px;
+
+color:#7A8798;
+
+font-size:14px;
+
+text-align:center;
+
+border-top:1px solid #E7EDF7;
+
+}
+  @media (max-width: 768px) {
+    .app { flex-direction: column; }
+    .sidebar{
+
+width:320px;
+
+background:linear-gradient(
+180deg,
+#061E47,
+#0B3D91);
+
+border-right:1px solid rgba(255,255,255,.08);
+
+box-shadow:
+8px 0 30px rgba(0,0,0,.12);
+
+}
+    .welcome-grid { grid-template-columns: 1fr; }
+    .metrics{
+
+grid-template-columns:1fr;
+
+}
+  }
+
+@keyframes fadeUp{
+
+from{
+
+opacity:0;
+
+transform:translateY(15px);
+
+}
+
+to{
+
+opacity:1;
+
+transform:translateY(0);
+
+}
+
+}
+
+.card,
+.scheme-card,
+.metric,
+.hero{
+
+animation:fadeUp .5s ease;
+
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h2><strong>🏛️ CivicGuardian AI</strong></h2>
+    <p class="tagline">Government Benefits Navigator</p>
+
+    <label>👤 Your Name (optional)</label>
+    <input type="text" id="name" placeholder="e.g. Rahul Kumar">
+
+    <label> Occupation</label>
+    <select id="occupation">
+      <option>Student</option>
+      <option>Farmer</option>
+      <option>Entrepreneur</option>
+      <option>Senior Citizen</option>
+      <option>Other</option>
+    </select>
+
+    <label> Annual Income (₹)</label>
+    <input type="number" id="income" value="150000" min="0" max="10000000" step="10000">
+
+    <label> Age</label>
+    <input type="number" id="age" value="25" min="0" max="120">
+
+    <label>📍 State</label>
+    <select id="state">
+      <option>Andhra Pradesh</option><option>Arunachal Pradesh</option><option>Assam</option>
+      <option>Bihar</option><option>Chhattisgarh</option><option>Delhi</option>
+      <option>Goa</option><option>Gujarat</option><option>Haryana</option>
+      <option>Himachal Pradesh</option><option>Jharkhand</option><option>Karnataka</option>
+      <option>Kerala</option><option>Madhya Pradesh</option><option selected>Maharashtra</option>
+      <option>Manipur</option><option>Meghalaya</option><option>Mizoram</option>
+      <option>Nagaland</option><option>Odisha</option><option>Punjab</option>
+      <option>Rajasthan</option><option>Sikkim</option><option>Tamil Nadu</option>
+      <option>Telangana</option><option>Tripura</option><option>Uttar Pradesh</option>
+      <option>Uttarakhand</option><option>West Bengal</option>
+      <option>Jammu & Kashmir</option><option>Ladakh</option><option>Puducherry</option>
+    </select>
+
+    <label> Gender</label>
+    <select id="gender">
+      <option value="MALE">Male</option>
+      <option value="FEMALE">Female</option>
+      <option value="OTHER">Other</option>
+    </select>
+
+    <label> Social Category</label>
+    <select id="caste">
+      <option>General</option><option>OBC</option><option>SC</option><option>ST</option>
+    </select>
+
+    <label class="check-label">
+      <input type="checkbox" id="disability"> ♿ Person with Disability
+    </label>
+
+    <hr>
+    <button class="analyze-btn" onclick="runAnalysis()"> Analyze My Benefits</button>
+    <p class="ai-status">✨ AI-Powered · 18 Schemes · 8 Agents</p>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main" id="mainContent">
+
+    <!-- Hero -->
+    <div class="hero">
+      <h1>🏛️ CivicGuardian AI</h1>
+      <p>Your Intelligent Government Benefits Navigator — discover schemes, verify documents & prepare applications with AI.</p>
+      <div class="version">v2.0 · India's Benefits Compass · 18+ Government Schemes</div>
+    </div>
+
+    <!-- Welcome screen -->
+    <div id="welcomeScreen">
+      <div class="welcome-grid">
+        <div class="card">
+          <h3> Welcome to CivicGuardian AI</h3>
+          <p style="margin-top:8px; color:#374151; font-size:0.92rem;">Fill in your <strong>citizen profile</strong> in the sidebar and click <strong>Analyze My Benefits</strong>.</p>
+          <br>
+          <p style="font-size:0.88rem; font-weight:600; color:var(--primary);">Our multi-agent AI system will:</p>
+          <ul class="feature-list" style="margin-top:8px;">
+            <li>Match you to eligible government schemes</li>
+            <li>Generate personalized AI explanations</li>
+            <li>Detect document types from your uploads</li>
+            <li>Build a step-by-step action plan</li>
+            <li>Calculate your application readiness score</li>
+            <li>Generate a downloadable PDF report</li>
+          </ul>
+          <p style="margin-top:12px; font-size:0.78rem; color:var(--muted);">Works for students, farmers, entrepreneurs, senior citizens, and more.</p>
+        </div>
+        <div>
+          <div class="metric"><div class="label">Schemes Database</div><div class="value">18+</div></div>
+          <br>
+          <div class="metric"><div class="label">AI Agents Active</div><div class="value">8</div></div>
+          <br>
+          <div class="metric"><div class="label">Categories Covered</div><div class="value">8</div></div>
+          <br>
+          <div class="metric"><div class="label">States Supported</div><div class="value">All</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loadingScreen" style="display:none;">
+      <div class="loading">
+        <div class="spinner"></div>
+        <p style="margin-top:16px; color:var(--primary); font-weight:600;">🤖 CivicGuardian agents are analyzing your eligibility...</p>
+        <p style="color:var(--muted); font-size:0.85rem; margin-top:6px;">Running eligibility checks, AI explanations, and building your action plan.</p>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div id="resultsScreen" style="display:none;"></div>
+
+    <div class="footer">
+      CivicGuardian AI is an informational tool, not an official government service.<br>
+      Always verify eligibility on official government portals before applying.
+    </div>
+  </main>
+</div>
+
+<script>
+// ─── Schemes Database ────────────────────────────────────────────────────────
+const SCHEMES = [
+  { id:"pm_kisan", name:"PM-KISAN Samman Nidhi", category:"Farmer", income_limit:200000, min_age:18, max_age:120, gender:"ANY", disability_only:false, caste:["ALL"], states:["ALL"], documents:["Aadhaar","Land Record","Income Certificate","Bank Passbook"], description:"Income support of ₹6,000 per year to all landholding farmer families, payable in three equal installments.", benefits:"₹6,000/year in 3 installments of ₹2,000 each via Direct Benefit Transfer.", website:"https://pmkisan.gov.in", priority:"High" },
+  { id:"kcc", name:"Kisan Credit Card (KCC)", category:"Farmer", income_limit:500000, min_age:18, max_age:75, gender:"ANY", disability_only:false, caste:["ALL"], states:["ALL"], documents:["Aadhaar","PAN","Land Record"], description:"Timely credit support for farmers for cultivation at low interest rates with crop insurance.", benefits:"Credit up to ₹3 lakh at 4% effective interest with interest subvention.", website:"https://www.myscheme.gov.in/schemes/kcc", priority:"High" },
+  { id:"pm_fasal_bima", name:"PM Fasal Bima Yojana", category:"Farmer", income_limit:0, min_age:18, max_age:120, gender:"ANY", disability_only:false, caste:["ALL"], states:["ALL"], documents:["Aadhaar","Land Record","Bank Passbook"], description:"Comprehensive crop insurance scheme for farmers suffering crop loss due to unforeseen events.", benefits:"Full crop loss insurance at 2% Kharif / 1.5% Rabi / 5% horticultural premium.", website:"https://pmfby.gov.in", priority:"High" },
+  { id:"pm_mudra", name:"PM MUDRA Yojana (PMMY)", category:"Entrepreneur", income_limit:1000000, min_age:18, max_age:65, gender:"ANY", disability_only:false, caste:["ALL"], states:["ALL"], documents:["Aadhaar","PAN","Bank Passbook","Income Certificate"], description:"Micro-finance loans to non-corporate, non-farm small enterprises for income generation.", benefits:"Collateral-free loans: Shishu ₹50K, Kishor ₹5L, Tarun ₹10L.", website:"https://www.mudra.org.in", priority:"High" },
+  { id:"pm_svanidhi", name:"PM SVANidhi (Street Vendor)", category:"Entrepreneur", income_limit:300000, min_age:18, max_age:65, gender:"ANY", disability_only:false, caste:["ALL"], states:["ALL"], documents:["Aadhaar","Bank Passbook"], description:"Micro-credit facility for street vendors to resume livelihoods.", benefits:"Working capital loan from ₹10,000 up to ₹50,000 with repayment.", website:"https://pmsvanidhi.mohua.gov.in", priority:"Medium" },
+  { id:"startup_india", name:"Startup India Seed Fund", category:"Entrepreneur", income_limit:0, min_age:21, max_age:45, gender:"ANY", disability_only:false, caste:["ALL"], states:["ALL"], documents:["Aadhaar","PAN","Bank Passbook"], description:"Financial assistance to DPIIT-recognized startups for proof of concept and market entry.", benefits:"Seed funding up to ₹5 crore through incubators.", website:"https://seedfund.startupindia.gov.in", priority:"Medium" },
+  { id:"nsp_scholarship", name:"National Scholarship Portal (NSP)", category:"Student", income_limit:450000, min_age:11, max_age:30, gender:"ANY", disability_only:false, caste:["ALL"], states:["ALL"], documents:["Aadhaar","Income Certificate","Marksheet","Bank Passbook"], description:"Consolidated scholarship platform for central government scholarship schemes.", benefits:"₹5,000–₹50,000 per year based on course and category.", website:"https://scholarships.gov.in", priority:"High" },
+  { id:"post_matric_sc_st", name:"Post-Matric Scholarship (SC/ST)", category:"Student", income_limit:250000, min_age:14, max_age:30, gender:"ANY", disability_only:false, caste:["SC","ST"], states:["ALL"], documents:["Aadhaar","Income Certificate","Caste Certificate","Marksheet","Bank Passbook"], description:"Financial assistance to SC/ST students for post-matric education.", benefits:"Course fees + ₹1,200–₹1,600/month maintenance allowance.", website:"https://socialjustice.gov.in", priority:"High" },
+  { id:"obc_scholarship", name:"Post-Matric Scholarship (OBC)", category:"Student", income_limit:300000, min_age:14, max_age:30, gender:"ANY", disability_only:false, caste:["OBC"], states:["ALL"], documents:["Aadhaar","Income Certificate","Caste Certificate","Marksheet","Bank Passbook"], description:"Financial assistance for OBC students pursuing post-matric education.", benefits:"₹1,000–₹1,200/month + course fee reimbursement.", website:"https://scholarships.gov.in", priority:"High" },
+  { id:"pm_vaya_vandana", name:"PM Vaya Vandana Yojana", category:"Senior Citizen", income_limit:0, min_age:60, max_age:120, gender:"ANY", disability_only:false, caste:["ALL"], states:["ALL"], documents:["Aadhaar","PAN","Bank Passbook"], description:"Pension scheme for senior citizens offering assured pension for 10 years.", benefits:"Pension up to ₹10,000/month for 10 years at 7.4% per annum.", website:"https://licindia.in", priority:"High" },
+  { id:"nsap_old_age", name:"NSAP Old Age Pension", category:"Senior Citizen", income_limit:120000, min_age:60, max_age:120, gender:"ANY", disability_only:false, caste:["ALL"], states:["ALL"], documents:["Aadhaar","Income Certificate","Bank Passbook"], description:"Social assistance to BPL senior citizens with little or no regular subsistence.", benefits:"₹300–₹500/month pension for BPL senior citizens.", website:"https://nsap.nic.in", priority:"High" },
+  { id:"pm_jay", name:"PM-JAY Ayushman Bharat", category:"Healthcare", income_limit:300000, min_age:0, max_age:120, gender:"ANY", disability_only:false, caste:["ALL"], states:["ALL"], documents:["Aadhaar","Ration Card","Income Certificate"], description:"World's largest government-funded health insurance for cashless hospitalization.", benefits:"Health cover of ₹5 lakh per family per year at empaneled hospitals.", website:"https://pmjay.gov.in", priority:"High" },
+  { id:"pm_awas", name:"PM Awas Yojana - Urban", category:"Housing", income_limit:1800000, min_age:21, max_age:70, gender:"ANY", disability_only:false, caste:["ALL"], states:["ALL"], documents:["Aadhaar","Income Certificate","Bank Passbook","Domicile Certificate"], description:"Housing for all scheme providing interest subsidy on home loans.", benefits:"Interest subsidy 3–6.5% on home loans; ₹1.5 lakh direct for EWS.", website:"https://pmaymis.gov.in", priority:"Medium" },
+  { id:"ujjwala", name:"PM Ujjwala Yojana", category:"General", income_limit:200000, min_age:18, max_age:60, gender:"FEMALE", disability_only:false, caste:["ALL"], states:["ALL"], documents:["Aadhaar","Ration Card","Bank Passbook"], description:"Free LPG gas connections to women from BPL households.", benefits:"Free LPG connection + first refill free + ₹1,600 financial assistance.", website:"https://pmuy.gov.in", priority:"High" },
+  { id:"pmegp", name:"PM Employment Generation Programme", category:"Entrepreneur", income_limit:0, min_age:18, max_age:55, gender:"ANY", disability_only:false, caste:["ALL"], states:["ALL"], documents:["Aadhaar","PAN","Income Certificate","Marksheet","Bank Passbook"], description:"Credit-linked subsidy scheme for employment through micro enterprises.", benefits:"Subsidy 15–35% of project cost (max ₹25L manufacturing, ₹10L service).", website:"https://www.kviconline.gov.in/pmegpeportal", priority:"High" },
+  { id:"pmsby", name:"PM Suraksha Bima Yojana", category:"Insurance", income_limit:0, min_age:18, max_age:70, gender:"ANY", disability_only:false, caste:["ALL"], states:["ALL"], documents:["Aadhaar","Bank Passbook"], description:"Accidental death and disability insurance at nominal premium.", benefits:"₹2 lakh accidental death cover at just ₹20/year premium.", website:"https://jansuraksha.gov.in", priority:"High" },
+  { id:"pmjjby", name:"PM Jeevan Jyoti Bima Yojana", category:"Insurance", income_limit:0, min_age:18, max_age:50, gender:"ANY", disability_only:false, caste:["ALL"], states:["ALL"], documents:["Aadhaar","Bank Passbook"], description:"Life insurance offering ₹2 lakh coverage at renewable annual premium.", benefits:"₹2 lakh life cover for just ₹436/year (auto-debited).", website:"https://jansuraksha.gov.in", priority:"High" },
+  { id:"weavers", name:"Weavers Mudra Scheme", category:"Entrepreneur", income_limit:300000, min_age:18, max_age:60, gender:"ANY", disability_only:false, caste:["ALL"], states:["ALL"], documents:["Aadhaar","Income Certificate","Bank Passbook"], description:"Credit support and interest subvention for handloom weavers and artisans.", benefits:"Credit up to ₹2 lakh at 6% interest with 7% subvention.", website:"https://handlooms.nic.in", priority:"Medium" },
+];
+
+const CATEGORY_MAP = {
+  "Farmer": ["Farmer"],
+  "Student": ["Student","Education"],
+  "Entrepreneur": ["Entrepreneur","Business","MSME"],
+  "Senior Citizen": ["Senior Citizen","Pension"],
+  "Other": []
+};
+const UNIVERSAL_CATS = ["General","All","Healthcare","Insurance","Housing"];
+
+const DOC_ACTIONS = {
+  "Aadhaar": "Visit nearest Aadhaar Seva Kendra or update at uidai.gov.in",
+  "PAN": "Apply online at tin.tin.nsdl.com or incometaxindiaefiling.gov.in",
+  "Income Certificate": "Apply at your local Tehsil/Block office with salary slips",
+  "Land Record": "Obtain from local Patwari or state land records portal",
+  "Bank Passbook": "Collect updated passbook from your nearest bank branch",
+  "Caste Certificate": "Apply at Sub-Divisional Magistrate (SDM) office",
+  "Disability Certificate": "Obtain from Chief Medical Officer at district hospital",
+  "Marksheet": "Collect from your school/college/university",
+  "Domicile Certificate": "Apply at Tehsil/SDM office with residence proof",
+  "Ration Card": "Apply at Food & Civil Supplies department office",
+};
+const DOC_DAYS = { "Aadhaar":3,"PAN":15,"Income Certificate":7,"Land Record":10,"Bank Passbook":2,"Caste Certificate":14,"Disability Certificate":21,"Marksheet":5,"Domicile Certificate":10,"Ration Card":14 };
+
+// ─── Eligibility Engine ──────────────────────────────────────────────────────
+function checkEligibility(profile, scheme) {
+  let score = 80;
+  const income = parseInt(profile.income) || 0;
+  const age = parseInt(profile.age) || 0;
+
+  if (scheme.income_limit > 0 && income > scheme.income_limit) return [false, 0];
+  if (scheme.income_limit > 0) score -= Math.floor((income / scheme.income_limit) * 10);
+  if (age < scheme.min_age || age > scheme.max_age) return [false, 0];
+
+  const occ = profile.occupation;
+  const cat = scheme.category;
+  const allowed = CATEGORY_MAP[occ] || [];
+
+  if (UNIVERSAL_CATS.includes(cat)) score += 5;
+  else if (occ === "Other") { if (!UNIVERSAL_CATS.includes(cat)) score -= 15; }
+  else if (allowed.includes(cat)) score += 15;
+  else if (!UNIVERSAL_CATS.includes(cat)) return [false, 0];
+
+  if (scheme.gender !== "ANY" && scheme.gender !== "ALL" && scheme.gender !== profile.gender) return [false, 0];
+  if (scheme.disability_only && !profile.disability) return [false, 0];
+  if (scheme.caste && !scheme.caste.includes("ALL") && !scheme.caste.includes(profile.caste)) return [false, 0];
+
+  return [true, Math.max(0, Math.min(100, score))];
+}
+
+function runEligibility(profile) {
+  const results = [];
+  for (const scheme of SCHEMES) {
+    const [eligible, score] = checkEligibility(profile, scheme);
+    if (eligible) {
+      results.push({ ...scheme, match_score: score });
+    }
+  }
+  results.sort((a,b) => {
+    if (b.match_score !== a.match_score) return b.match_score - a.match_score;
+    const po = {High:0,Medium:1,Low:2};
+    return (po[a.priority]||1) - (po[b.priority]||1);
+  });
+  return results;
+}
+
+// ─── Rule-based Explanation ───────────────────────────────────────────────────
+function generateExplanation(profile, scheme) {
+  const occ = profile.occupation.toLowerCase();
+  const income = parseInt(profile.income).toLocaleString('en-IN');
+  const docs = scheme.documents.join(", ");
+  return `Why You Qualify:\nAs a ${occ} with an annual income of ₹${income}, you fall within the eligibility criteria for ${scheme.name}. Your age (${profile.age}), state (${profile.state}), and category match the scheme requirements.\n\nKey Benefits:\n${scheme.benefits}\n\nHow To Apply:\nVisit the official portal at ${scheme.website}, register or log in, complete the application form, upload the required documents (${docs}), and submit for verification.\n\nNext Steps:\n1) Keep your documents ready and self-attested.\n2) Link your bank account to Aadhaar for Direct Benefit Transfer.\n3) Track your application status online after submission.`;
+}
+
+// ─── Planner ──────────────────────────────────────────────────────────────────
+function buildPlan(eligible) {
+  const required = new Set();
+  for (const s of eligible) for (const d of s.documents) required.add(d);
+  const reqArr = [...required].sort();
+  const missing = reqArr; // No uploads in this demo
+  const plan = missing.map((doc, i) => ({
+    step: i+1, document: doc,
+    action: DOC_ACTIONS[doc] || `Obtain ${doc} from the relevant office`,
+    days: DOC_DAYS[doc] || 7
+  }));
+  const timeline = missing.reduce((max, d) => Math.max(max, DOC_DAYS[d]||7), 0);
+  return { required: reqArr, uploaded: [], missing, plan, timeline };
+}
+
+// ─── Main Analysis ────────────────────────────────────────────────────────────
+function runAnalysis() {
+  const profile = {
+    name: document.getElementById('name').value.trim(),
+    occupation: document.getElementById('occupation').value,
+    income: parseInt(document.getElementById('income').value) || 0,
+    age: parseInt(document.getElementById('age').value) || 0,
+    state: document.getElementById('state').value,
+    gender: document.getElementById('gender').value,
+    caste: document.getElementById('caste').value,
+    disability: document.getElementById('disability').checked,
+  };
+
+  document.getElementById('welcomeScreen').style.display = 'none';
+  document.getElementById('loadingScreen').style.display = 'block';
+  document.getElementById('resultsScreen').style.display = 'none';
+
+  setTimeout(() => {
+    const eligible = runEligibility(profile);
+    const planner = buildPlan(eligible);
+    const readiness = eligible.length === 0 ? { score:0, level:"No Match" }
+      : planner.required.length === 0 ? { score:100, level:"Ready" }
+      : { score: Math.round((planner.uploaded.length / planner.required.length) * 100), level: "Needs Preparation" };
+
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('resultsScreen').style.display = 'block';
+    renderResults(profile, eligible, planner, readiness);
+  }, 1200);
+}
+
+// ─── Render ───────────────────────────────────────────────────────────────────
+function renderResults(profile, eligible, planner, readiness) {
+  const el = document.getElementById('resultsScreen');
+
+  const topScheme = eligible[0] ? eligible[0].name : "None found";
+  const scoreColor = readiness.score >= 70 ? '#138808' : readiness.score >= 40 ? '#EF6C00' : '#C62828';
+
+  let html = `
+    <div class="section-title">🧠 Your Benefits Summary</div>
+    <div class="metrics">
+      <div class="metric"><div class="label">Profile</div><div class="value" style="font-size:1.1rem;">${profile.occupation}</div></div>
+      <div class="metric"><div class="label">Annual Income</div><div class="value" style="font-size:1.1rem;">₹${parseInt(profile.income).toLocaleString('en-IN')}</div></div>
+      <div class="metric"><div class="label">Eligible Schemes</div><div class="value" style="color:var(--accent);">${eligible.length}</div></div>
+      <div class="metric"><div class="label">Readiness Score</div><div class="value" style="color:${scoreColor};">${readiness.score}%</div></div>
+      <div class="metric"><div class="label">Top Scheme</div><div class="value" style="font-size:0.75rem; padding:4px 0;">${topScheme}</div></div>
+      <div class="metric"><div class="label">Documents Needed</div><div class="value" style="color:var(--warning);">${planner.missing.length}</div></div>
+    </div>
+
+    ${eligible.length > 0 ? `<div class="alert alert-success">✅ We found <strong>${eligible.length} eligible scheme(s)</strong> for your profile. We recommend prioritising "<strong>${topScheme}</strong>" (${eligible[0].match_score}% match).</div>` : `<div class="alert alert-warn">⚠️ No schemes matched your profile. Try adjusting income, age, or occupation.</div>`}
+
+    <div class="section-title">📈 Application Readiness</div>
+    <div class="progress-track">
+      <div class="progress-fill" style="width:${readiness.score}%; background:linear-gradient(90deg,${scoreColor},${scoreColor}cc);">${readiness.score}%</div>
+    </div>
+    <p style="font-size:0.85rem; color:var(--muted); margin-top:6px;">
+      ${readiness.score === 0 ? "Gather the required documents below to improve your readiness."
+        : readiness.score < 40 ? `You have ${planner.uploaded.length} of ${planner.required.length} documents. Start with Aadhaar and PAN card first.`
+        : readiness.score < 70 ? `You have ${planner.uploaded.length} of ${planner.required.length} documents. Follow the action plan below.`
+        : "Excellent! You're almost ready to apply."}
+    </p>
+
+    <div class="section-title">🎯 Eligible Government Schemes</div>
+  `;
+
+  if (eligible.length === 0) {
+    html += `<div class="card"><p style="color:var(--muted);">No schemes matched your profile. Try adjusting your income, age, or occupation.</p></div>`;
+  } else {
+    for (const scheme of eligible) {
+      const priCls = scheme.priority === 'High' ? 'badge-high' : scheme.priority === 'Medium' ? 'badge-medium' : 'badge-low';
+      const scoreClr = scheme.match_score >= 80 ? '#138808' : scheme.match_score >= 60 ? '#EF6C00' : '#C62828';
+      const explanation = generateExplanation({ occupation:document.getElementById('occupation').value, income:document.getElementById('income').value, age:document.getElementById('age').value, state:document.getElementById('state').value }, scheme);
+      html += `
+        <div class="scheme-card">
+          <h4>📌 ${scheme.name}</h4>
+          <span class="badge badge-cat">${scheme.category}</span>
+          <span class="badge ${priCls}">${scheme.priority} Priority</span>
+          <span class="match-score" style="background:${scoreClr}22; color:${scoreClr}; border:1px solid ${scoreClr}55;">🎯 ${scheme.match_score}% Match</span>
+          <p class="desc">${scheme.description}</p>
+          <p class="meta"> <strong>Benefits:</strong> ${scheme.benefits}</p>
+          <p class="meta">📄 <strong>Required Docs:</strong> ${scheme.documents.join(', ')}</p>
+          <a class="link-btn" href="${scheme.website}" target="_blank" rel="noopener">🔗 Official Website</a>
+          <button class="explain-toggle" onclick="toggleExplanation(this)">💡 Show Explanation</button>
+          <div class="explanation-box">${explanation}</div>
+        </div>
+      `;
+    }
+  }
+
+  // Documents section
+  html += `<div class="section-title">📁 Document Status</div>`;
+  if (planner.required.length === 0) {
+    html += `<div class="alert alert-info">No specific documents required for your matched schemes.</div>`;
+  } else {
+    let pills = '';
+    for (const d of planner.uploaded) pills += `<span class="doc-have">✅ ${d}</span>`;
+    for (const d of planner.missing) pills += `<span class="doc-miss">❌ ${d}</span>`;
+    html += `<div class="card">${pills}</div>`;
+    if (planner.missing.length > 0) {
+      html += `<div class="tip">💡 <strong>Tip:</strong> Start with Aadhaar and PAN — these are required for most schemes and quickest to obtain.</div>`;
+    }
+  }
+
+  // Action plan
+  if (planner.plan.length > 0) {
+    html += `<div class="section-title">🗺️ Your Action Plan</div>`;
+    html += `<table class="action-table"><thead><tr><th>Step</th><th>Document Needed</th><th>What To Do</th><th>Est. Days</th></tr></thead><tbody>`;
+    for (const step of planner.plan) {
+      html += `<tr><td><strong>${step.step}</strong></td><td>${step.document}</td><td>${step.action}</td><td>${step.days}</td></tr>`;
+    }
+    html += `</tbody></table>`;
+    html += `<p style="font-size:0.82rem; color:var(--muted); margin-top:8px;">⏱️ Estimated total preparation time: ~${planner.timeline} days (documents can be obtained in parallel).</p>`;
+  } else if (eligible.length > 0) {
+    html += `<div class="alert alert-success">🎉 You have all required documents — you're ready to apply!</div>`;
+  }
+
+  // Info card
+  html += `
+    <div class="section-title">ℹ️ How to Run the Full App</div>
+    <div class="card">
+      <h3> Run CivicGuardian AI with Streamlit</h3>
+      <p style="margin-top:8px; font-size:0.88rem;">This is the static demo. For full features including PDF reports, Gemini AI explanations, and PDF document detection:</p>
+      <pre style="background:#F5F7FB; padding:12px; border-radius:8px; margin-top:10px; font-size:0.82rem; overflow-x:auto;">pip install -r requirements.txt
+streamlit run app.py</pre>
+      <p style="font-size:0.8rem; color:var(--muted); margin-top:8px;">Optional: Set GEMINI_API_KEY in .env for AI-powered personalized explanations.</p>
+    </div>
+  `;
+
+  el.innerHTML = html;
+}
+
+function toggleExplanation(btn) {
+  const box = btn.nextElementSibling;
+  box.classList.toggle('visible');
+  btn.textContent = box.classList.contains('visible') ? '💡 Hide Explanation' : '💡 Show Explanation';
+}
+</script>
+</body>
+</html>
