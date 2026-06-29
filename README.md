@@ -133,3 +133,4 @@ MIT License — see LICENSE file.
 ---
 
 *CivicGuardian AI is an informational tool. Always verify eligibility on official government portals.*
+
