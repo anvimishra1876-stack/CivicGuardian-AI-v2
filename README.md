@@ -390,7 +390,7 @@ streamlit run app.py
 
 **Anvi Mishra**
 
-B.Tech CSE (Data Science)
+B.Tech CSE
 
 ---
 
