@@ -14,6 +14,16 @@ from __future__ import annotations
 import os
 from typing import Any, Dict, List
 
+import streamlit as st
+import os
+
+api_key = None
+
+try:
+    api_key = st.secrets["GEMINI_API_KEY"]
+except Exception:
+    api_key = os.getenv("GEMINI_API_KEY")
+
 import pandas as pd
 import streamlit as st
 from dotenv import load_dotenv
